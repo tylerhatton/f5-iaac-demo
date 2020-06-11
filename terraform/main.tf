@@ -34,15 +34,16 @@ module "f5_ltm_dev" {
   external_subnet_id = module.vpc.external_subnet_id
   internal_subnet_id = module.vpc.internal_subnet_id
 
-  external_ips       = ["10.0.10.101"]
+  external_ips       = ["10.0.10.101", "10.0.10.102", "10.0.10.103", "10.0.10.104", "10.0.10.105"]
   internal_self_ip   = "10.0.138.101"
   management_ip      = "10.0.30.101"
   
   bigiq_secret_name = var.bigiq_secret_name
 
   default_tags       = {
-      id = "devltm01"
+      id          = "devltm01"
       environment = "dev"
+      type        = "bigip"
   }
 }
 
@@ -57,14 +58,15 @@ module "f5_ltm_prd" {
   external_subnet_id = module.vpc.external_subnet_id
   internal_subnet_id = module.vpc.internal_subnet_id
 
-  external_ips       = ["10.0.10.106"]
+  external_ips       = ["10.0.10.106", "10.0.10.107", "10.0.10.108", "10.0.10.109", "10.0.10.110"]
   internal_self_ip   = "10.0.138.102"
   management_ip      = "10.0.30.102"
 
   bigiq_secret_name = var.bigiq_secret_name
 
   default_tags       = {
-      id = "prdltm01"
+      id          = "prdltm01"
       environment = "prd"
+      type        = "bigip"
   }
 }

@@ -1,0 +1,8 @@
+---
+HTTP_Health_Monitors:
+  - name: test_http_monitor
+    send: "/"
+    receive: "It Works!"
+  - name: test_http_monitor2
+    send: "/"
+    receive: "200"

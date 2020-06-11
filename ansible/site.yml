@@ -1,1 +1,43 @@
 ---
+- name: Create F5 configurations
+  hosts: tag_type_bigip
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: Create HTTP Health Monitors
+    bigip_monitor_http:
+      provider: "{{ provider }}"
+      name: "{{ item.name }}"
+      send: "{{ item.send | default(omit) }}"
+      receive: "{{ item.receive | default(omit) }}"
+      target_username: "{{ item.target_username | default(omit) }}"
+      target_password: "{{ item.target_password | default(omit) }}"
+    loop: "{{ HTTP_Health_Monitors }}"
+
+  - name: Create F5 Pool
+    bigip_pool:
+      provider: "{{ provider }}"
+      name: "{{ item.name }}"
+      monitor_type: "{{ item.monitor_type | default(omit) }}"
+      monitors: "{{ item.monitors | default(omit) }}"
+      fqdn: "{{ item.fqdn | default(omit) }}"
+    loop: "{{ Pools }}"
+
+  - name: Assign Nodes to the Pool
+    bigip_pool_member:
+      provider: "{{ provider }}"
+      pool: "{{ item.name }}"
+      aggregate: "{{ item.members }}"
+    with_items: "{{ Pools }}"
+ 
+  - name: Create F5 Virtual Server
+    bigip_virtual_server:
+      provider: "{{ provider }}"
+      name: "{{ item.name }}"
+      all_profiles: "{{ item.all_profiles | default(omit) }}"
+      destination: "{{ item.destination | default(omit) }}"
+      port: "{{ item.port | default(omit) }}"
+      pool: "{{ item.pool | default(omit) }}"
+      snat: "{{ item.snat | default(omit) }}"
+      irules: "{{ item.irules | default(omit) }}"
+    with_items: "{{ Virtual_Servers }}"
