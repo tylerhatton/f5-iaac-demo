@@ -1,0 +1,26 @@
+---
+stages:
+  - test
+  - deploy
+
+Test_Playbook:
+  stage: test
+  image: tylerhatton/ansible-ci:1.0
+  script:
+    - ci-check.sh
+
+Deploy_Playbook:
+  stage: deploy
+  image: tylerhatton/ansible-ci:1.0
+  only:
+    - master
+  script:
+    - "curl -k -X POST -u ${tower_username}:${tower_password} https://${tower_server}/api/v2/job_templates/${tower_job_id}/launch/"
+
+# Run_Security_Scan:
+#   stage: qa
+#   image: tylerhatton/f5-zap-demo-scan:1.0
+#   only:
+#     - master
+#   script:
+#     - "run-attack.sh group_vars/bigips.yml"
