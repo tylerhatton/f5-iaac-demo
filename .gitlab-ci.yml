@@ -6,6 +6,9 @@ stages:
 Test_Playbook:
   stage: test
   image: tylerhatton/ansible-ci:1.0
+  only:
+    - dev
+    - master
   script:
     - ci-check.sh
 
