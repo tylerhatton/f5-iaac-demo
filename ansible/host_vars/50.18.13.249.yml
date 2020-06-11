@@ -49,3 +49,10 @@ Virtual_Servers:
     port: 80
     pool: web_pool_2
     snat: automap
+  - name: web_vip_2
+    all_profiles:
+      - http
+    destination: 10.0.10.107
+    port: 80
+    pool: web_pool_1
+    snat: automap
