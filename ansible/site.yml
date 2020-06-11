@@ -29,7 +29,7 @@
       pool: "{{ item.name }}"
       aggregate: "{{ item.members }}"
     with_items: "{{ Pools }}"
- 
+
   - name: Create F5 Virtual Server
     bigip_virtual_server:
       provider: "{{ provider }}"

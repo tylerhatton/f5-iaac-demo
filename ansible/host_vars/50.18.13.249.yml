@@ -15,13 +15,13 @@ provider:
             36633839363432656262336337396562666164633666346364346331646361646234386234623238
             3638663737313764660a643262366662353833353763373639386566336233666466393036643632
             30383531646364393530343434376330623839333338323965636335353831663333
-  validate_certs: no
+  validate_certs: false
 
 Pools:
   - name: web_pool_1
     monitors:
-    - /Common/tcp
-    - /Common/http
+      - /Common/tcp
+      - /Common/http
     members:
       - host: 10.33.10.10
         port: 80
@@ -32,7 +32,7 @@ Pools:
     state: present
   - name: web_pool_2
     monitors:
-    - /Common/tcp
+      - /Common/tcp
     members:
       - host: 1.1.1.1
         port: 80
