@@ -17,3 +17,6 @@ iRules:
   - name: test_irule_1
     content: "{{ lookup('file', playbook_dir + '/irules/test_irule_1.tcl') }}"
     module: ltm
+  - name: test_irule_2
+    content: "{{ lookup('file', playbook_dir + '/irules/test_irule_2.tcl') }}"
+    module: ltm
