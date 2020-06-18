@@ -1,0 +1,9 @@
+---
+Virtual_Servers:
+  - name: test_vip
+    all_profiles:
+      - http
+    destination: 10.0.10.101
+    port: 80
+    pool: test_pool_2
+    snat: automap

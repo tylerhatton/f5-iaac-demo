@@ -4,40 +4,78 @@
   connection: local
   gather_facts: false
   tasks:
-  - name: Create HTTP Health Monitors
-    bigip_monitor_http:
+  - name: Collect BIGIP Failover Status
+    bigip_device_info:
       provider: "{{ provider }}"
-      name: "{{ item.name }}"
-      send: "{{ item.send | default(omit) }}"
-      receive: "{{ item.receive | default(omit) }}"
-      target_username: "{{ item.target_username | default(omit) }}"
-      target_password: "{{ item.target_password | default(omit) }}"
-    loop: "{{ HTTP_Health_Monitors }}"
+      gather_subset:
+        - devices
+    register: devices
 
-  - name: Create F5 Pool
-    bigip_pool:
-      provider: "{{ provider }}"
-      name: "{{ item.name }}"
-      monitor_type: "{{ item.monitor_type | default(omit) }}"
-      monitors: "{{ item.monitors | default(omit) }}"
-      fqdn: "{{ item.fqdn | default(omit) }}"
-    loop: "{{ Pools }}"
+  - name: Configure BIGIP Objects
+    block:
+      - name: Create HTTP Health Monitors
+        bigip_monitor_http:
+          provider: "{{ provider }}"
+          name: "{{ item.name }}"
+          send: "{{ item.send | default(omit) }}"
+          receive: "{{ item.receive | default(omit) }}"
+          target_username: "{{ item.target_username | default(omit) }}"
+          target_password: "{{ item.target_password | default(omit) }}"
+          state: "{{ item.state | default('present') }}"
+        loop: "{{ HTTP_Health_Monitors }}"
+        notify:
+          - Save running config to disk
 
-  - name: Assign Nodes to the Pool
-    bigip_pool_member:
-      provider: "{{ provider }}"
-      pool: "{{ item.name }}"
-      aggregate: "{{ item.members }}"
-    with_items: "{{ Pools }}"
+      - name: Create F5 Pool
+        bigip_pool:
+          provider: "{{ provider }}"
+          name: "{{ item.name }}"
+          monitor_type: "{{ item.monitor_type | default(omit) }}"
+          monitors: "{{ item.monitors | default(omit) }}"
+          fqdn: "{{ item.fqdn | default(omit) }}"
+          state: "{{ item.state | default('present') }}"
+        loop: "{{ Pools }}"
+        notify:
+          - Save running config to disk
 
-  - name: Create F5 Virtual Server
-    bigip_virtual_server:
-      provider: "{{ provider }}"
-      name: "{{ item.name }}"
-      all_profiles: "{{ item.all_profiles | default(omit) }}"
-      destination: "{{ item.destination | default(omit) }}"
-      port: "{{ item.port | default(omit) }}"
-      pool: "{{ item.pool | default(omit) }}"
-      snat: "{{ item.snat | default(omit) }}"
-      irules: "{{ item.irules | default(omit) }}"
-    with_items: "{{ Virtual_Servers }}"
+      - name: Assign Nodes to the Pool
+        bigip_pool_member:
+          provider: "{{ provider }}"
+          pool: "{{ item.name }}"
+          aggregate: "{{ item.members }}"
+          state: "{{ item.state | default('present') }}"
+        loop: "{{ Pools }}"
+        notify:
+          - Save running config to disk
+
+      - name: Create iRules
+        bigip_irule:
+          provider: "{{ provider }}"
+          name: "{{ item.name }}"
+          content: "{{ item.content }}"
+          module: "{{ item.module }}"
+        loop: "{{ iRules }}"
+        notify:
+          - Save running config to disk
+
+      - name: Create F5 Virtual Server
+        bigip_virtual_server:
+          provider: "{{ provider }}"
+          name: "{{ item.name }}"
+          all_profiles: "{{ item.all_profiles | default(omit) }}"
+          destination: "{{ item.destination | default(omit) }}"
+          port: "{{ item.port | default(omit) }}"
+          pool: "{{ item.pool | default(omit) }}"
+          snat: "{{ item.snat | default(omit) }}"
+          irules: "{{ item.irules | default(omit) }}"
+          state: "{{ item.state | default('present') }}"
+        loop: "{{ Virtual_Servers }}"
+        notify:
+          - Save running config to disk
+    when: ec2_private_ip_address == (devices.devices | selectattr('failover_state', 'search', 'active') | list | first).management_address
+
+  handlers:
+    - name: Save running config to disk
+      bigip_config:
+        provider: "{{ provider }}"
+        save: yes

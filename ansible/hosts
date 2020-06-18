@@ -1,2 +1,9 @@
-[tag_type_bigip]
-tag_id_devltm01 ansible_host=50.18.243.21
+[tag_type_bigip:children]
+tag_id_devltm01
+tag_id_prdltm01
+
+[tag_id_devltm01]
+50.18.243.21 ec2_private_ip_address=10.0.30.101
+
+[tag_id_prdltm01]
+50.18.13.249 ec2_private_ip_address=10.0.30.102

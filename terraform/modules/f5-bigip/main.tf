@@ -196,3 +196,17 @@ resource "aws_security_group" "f5_internal_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# Secrets
+resource "aws_secretsmanager_secret" "bigip_creds" {
+  name = aws_eip.f5_mgmt_ip.public_ip
+}
+
+resource "aws_secretsmanager_secret_version" "bigip_creds" {
+  secret_id     = aws_secretsmanager_secret.bigip_creds.id
+  secret_string = jsonencode({
+    mgmt-ip=aws_eip.f5_mgmt_ip.public_ip,
+    username="admin",
+    password=random_password.admin_password.result
+  })
+}

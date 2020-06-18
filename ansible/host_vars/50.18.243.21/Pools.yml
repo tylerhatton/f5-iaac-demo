@@ -1,0 +1,24 @@
+---
+Pools:
+  - name: test_pool_1
+    monitors:
+      - /Common/tcp
+      - /Common/http
+    members:
+      - host: 10.33.10.10
+        port: 80
+        state: enabled
+      - host: 10.33.10.11
+        port: 80
+        state: enabled
+    state: present
+  - name: test_pool_2
+    monitors:
+      - /Common/tcp
+    members:
+      - host: 1.1.1.1
+        port: 80
+        state: enabled
+      - host: 1.1.1.2
+        port: 80
+        state: enabled

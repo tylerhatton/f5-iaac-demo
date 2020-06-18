@@ -1,4 +1,10 @@
 ---
+provider:
+  server: "{{ ansible_host }}"
+  user: "{{ (lookup('aws_secret', inventory_hostname, region='us-west-1') | from_json).get('username') }}"
+  password: "{{ (lookup('aws_secret', inventory_hostname, region='us-west-1') | from_json).get('password') }}"
+  validate_certs: no
+
 HTTP_Health_Monitors:
   - name: test_http_monitor
     send: "/"
@@ -6,3 +12,8 @@ HTTP_Health_Monitors:
   - name: test_http_monitor2
     send: "/"
     receive: "200"
+
+iRules:
+  - name: test_irule_1
+    content: "{{ lookup('file', playbook_dir + '/irules/test_irule_1.tcl') }}"
+    module: ltm
