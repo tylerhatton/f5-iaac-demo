@@ -3,7 +3,7 @@ provider:
   server: "{{ ansible_host }}"
   user: "{{ (lookup('aws_secret', inventory_hostname, region='us-west-1') | from_json).get('username') }}"
   password: "{{ (lookup('aws_secret', inventory_hostname, region='us-west-1') | from_json).get('password') }}"
-  validate_certs: no
+  validate_certs: false
 
 HTTP_Health_Monitors:
   - name: test_http_monitor

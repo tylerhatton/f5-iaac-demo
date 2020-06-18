@@ -78,4 +78,4 @@
     - name: Save running config to disk
       bigip_config:
         provider: "{{ provider }}"
-        save: yes
+        save: true
